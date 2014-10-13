@@ -1,0 +1,11 @@
+#!/bin/bash
+
+. test_helper.sh
+TIMEOUT=30
+
+if [ "$1" != "wait" ]
+then
+    run_test "exploded.integration" $TIMEOUT
+else
+    lein run
+fi

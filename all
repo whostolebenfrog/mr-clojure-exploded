@@ -1,0 +1,45 @@
+#!/bin/bash
+
+exit_if_fail () {
+    if [ $? -ne 0 ]
+    then
+        echo -e "\e[31m"
+        echo ""
+        echo "     FAIL WHALE!"
+        echo -e "\e[34m"
+        echo ""
+        echo "W     W      W        "
+        echo "W        W  W     W    "
+        echo "              '.  W      "
+        echo "  .-\"\"-._     \ \.--|  "
+        echo " /       \"-..__) .-'   "
+        echo "|     _         /      "
+        echo "\\'-.__,   .__.,'       "
+        echo " \`'----'._\\--'      "
+        echo ""
+        echo "$1 test failure! Why would you even write something like that?"
+        echo -e "\e[0m"
+        exit 1
+    fi
+}
+
+echo "Running unit tests"
+
+lein midje :filter unit
+exit_if_fail Unit
+
+echo "Running integration tests"
+
+./integration
+exit_if_fail Integration
+
+sleep 1
+
+echo "Running acceptance tests"
+
+./acceptance
+exit_if_fail Acceptance
+
+sleep 1
+
+exit 0

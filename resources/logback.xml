@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
+  <!-- Suppress messages that may cause deadlock -->
+  <logger name="org.eclipse.jetty.webapp.WebAppClassLoader" level="off" />
+
+  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>${LOGGING_FILETHRESHOLD:-info}</level>
+    </filter>
+    <file>${LOGGING_PATH:-/tmp}/${SERVICE_NAME}.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOGGING_PATH:-/tmp}/${SERVICE_NAME}.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+      <maxHistory>28</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d [%thread] %-5level %X{log-id} %logger{36} - %msg%n%ex</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>${LOGGING_CONSOLETHRESHOLD:-info}</level>
+    </filter>
+    <encoder>
+      <pattern>%d [%thread] %-5level %X{log-id} %logger{36} - %msg%n%ex</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="stash" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>${LOGGING_STASHTHRESHOLD:-warn}</level>
+    </filter>
+    <filter class="mixradio.metrics.GraphiteReporterFilter" />
+    <file>${LOGGING_PATH:-/tmp}/${SERVICE_NAME}-stash.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOGGING_PATH:-/tmp}/${SERVICE_NAME}-stash.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>50MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>1</maxHistory>
+    </rollingPolicy>
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+  </appender>
+
+  <root level="${LOGGING_LEVEL:-info}">
+    <appender-ref ref="file" />
+    <appender-ref ref="console" />
+    <appender-ref ref="stash" />
+  </root>
+
+</configuration>
